@@ -122,7 +122,12 @@ void dragonfly::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
   if (!Args.hasArg(options::OPT_nostdlib, options::OPT_nodefaultlibs,
                    options::OPT_r)) {
-    CmdArgs.push_back("-L/usr/lib/gcc80");
+
+    if (!D.SysRoot.empty()) {
+      CmdArgs.push_back(Args.MakeArgString("-L" + D.SysRoot + "/usr/lib"));
+      CmdArgs.push_back(Args.MakeArgString("-L" + D.SysRoot + "/usr/lib/gcc80"));
+    } else
+      CmdArgs.push_back("-L/usr/lib/gcc80");
 
     if (!Args.hasArg(options::OPT_static)) {
       CmdArgs.push_back("-rpath");
@@ -191,8 +196,9 @@ DragonFly::DragonFly(const Driver &D, const llvm::Triple &Triple,
     getProgramPaths().push_back(getDriver().Dir);
 
   getFilePaths().push_back(getDriver().Dir + "/../lib");
-  getFilePaths().push_back("/usr/lib");
-  getFilePaths().push_back("/usr/lib/gcc80");
+
+  getFilePaths().push_back(concat(getDriver().SysRoot, "/usr/lib"));
+  getFilePaths().push_back(concat(getDriver().SysRoot, "/usr/lib/gcc80"));
 }
 
 Tool *DragonFly::buildAssembler() const {
