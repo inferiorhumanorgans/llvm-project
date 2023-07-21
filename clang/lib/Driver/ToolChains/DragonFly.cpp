@@ -208,3 +208,9 @@ Tool *DragonFly::buildAssembler() const {
 Tool *DragonFly::buildLinker() const {
   return new tools::dragonfly::Linker(*this);
 }
+
+void DragonFly::addLibStdCxxIncludePaths(const llvm::opt::ArgList &DriverArgs,
+                                      llvm::opt::ArgStringList &CC1Args) const {
+  addLibStdCXXIncludePaths(getDriver().SysRoot + "/usr/include/c++/8.0", "", "",
+                           DriverArgs, CC1Args);
+}
